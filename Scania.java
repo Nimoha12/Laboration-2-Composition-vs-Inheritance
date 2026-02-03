@@ -2,6 +2,8 @@ import java.awt.*;
 
 public class Scania extends Car{
     private double flatBed;
+    private boolean flatBedUp;          // the flatbed raise
+    private boolean flatBedDown;        // the flatbed lower
 
     public Scania(){
         super(2, 1000, Color.white, "Scania");
@@ -10,16 +12,33 @@ public class Scania extends Car{
 
     public double getFlatBed(){ return flatBed;}
     // the maximum angle of the flatbed should not exceed 70 degree and raise only if the truck is stopped
-    public void raiseFlatBed(double angle){
+    public void raiseFlatBed(double degree){
+        flatBedUp();
         if(getCurrentSpeed() == 0){
-        flatBed = Math.min(flatBed + angle, 70.0);
+        flatBed = Math.min(flatBed + degree, 70.0);
         }
     }
     // the minimum angle of the flatbed should not exceed 0 degree
-    public void lowerFlatBed(double angle){
-        flatBed = Math.max(flatBed - angle, 0.0);
+    public void lowerFlatBed(double degree){
+        flatBedDown();
+        flatBed = Math.max(flatBed - degree, 0.0);
+    }
+    public boolean flatBedUp(){
+        if(getFlatBed() > 0 || getFlatBed() < 70){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public boolean flatBedDown(){
+        if(getFlatBed() > 0 || getFlatBed() < 70){
+            return true;
+        } else {
+            return false;
+    }
     }
     // the truck drives if and only the flatbed is at 0 degree
+    // might fix this later
     @Override
     public void move(){
         if(flatBed == 0){
