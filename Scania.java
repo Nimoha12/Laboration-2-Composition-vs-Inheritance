@@ -1,59 +1,38 @@
 import java.awt.*;
 
 public class Scania extends Car{
-    private double flatBed;
-    private boolean flatBedUp;          // the flatbed raise
-    private boolean flatBedDown;        // the flatbed lower
+    private final Flak flak = new Flak();   // composition
 
     public Scania(){
         super(2, 1000, Color.white, "Scania");
-        this.flatBed = 0.0;
     }
 
-    public double getFlatBed(){
-        return flatBed;}
+    public double getFlak(){
+        return flak.getAngle();
+    }
 
-    // the maximum angle of the flatbed should not exceed 70 degree and raise only if the truck is stopped
-    public void raiseFlatBed(double degree){
-        flatBedUp();
-        if(getCurrentSpeed() == 0){
-        flatBed = Math.min(flatBed + degree, 70.0);
-        }
+    public void raiseFlak(double degree){
+        if (getCurrentSpeed() != 0) throw new IllegalStateException("Cannot raise while moving");
+        if (degree < 0 || degree > 70) throw new IllegalArgumentException("Out of range limit");
+        flak.raise();
+
     }
-    // the minimum angle of the flatbed should not exceed 0 degree
-    public void lowerFlatBed(double degree){
-        flatBedDown();
-        flatBed = Math.max(flatBed - degree, 0.0);
+    public void lowerFlak(double degree){
+        if (getCurrentSpeed() != 0) throw new IllegalStateException("Cannot lower while moving");
+        if (degree < 0 || degree > 70) throw new IllegalArgumentException("Out of range limit");
+        flak.lower();
     }
-    // a helper function (flag) that see if we can still raise or lower the flatbed
-    // to prevent raising and lowering beyond the allowed range
-    public boolean flatBedUp(){
-        if(getFlatBed() > 0 && getFlatBed() < 70){
-            return true;
-        } else {
-            return false;
-        }
-    }
-    public boolean flatBedDown(){
-        if(getFlatBed() > 0 && getFlatBed() < 70){
-            return true;
-        } else {
-            return false;}
-    }
-    // the truck drives if and only the flatbed is at 0 degree
-    // might fix this later
+    // check if flak is up, prevent accelerating while the flak is raised
     @Override
-    public void move(){
-        if(flatBed == 0){
-            super.move();
-        }
+    public void gas(double amount){
+        if(flak.isRaised()) return;
+        super.gas(amount);
+
     }
     // the truck cannot drive if the flatbed angle is non-zero, means speed = 0
     @Override
     protected double speedFactor(){
-        if(flatBed > 0){
-            return 0;
-        }
+        if(flak.isRaised()) return 0;
         return getEnginePower() * 0.01;
     }
 }

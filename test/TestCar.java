@@ -253,26 +253,23 @@ public class TestCar {
     // the angle of flatbed should only stay in 0-70 degree
     @Test
     void flankBedRange(){
-        double degree = scania.getFlatBed();
+        double degree = scania.getFlak();
         if( degree < 0 || degree > 70.0){
-            assertThrows(IllegalArgumentException.class,() -> scania.raiseFlatBed(80));
+            assertThrows(IllegalArgumentException.class,() -> scania.raiseFlak(80));
         }
     }
-    // the flatbed cannot raise when the truck is driving, otherwise can
+    // the flatbed cannot raise when the truck is driving
     @Test
     void flankBedCondition(){
         double speed = scania.getCurrentSpeed();
         if( speed > 0 ){
-            assertThrows(IllegalArgumentException.class, () ->  scania.raiseFlatBed(10));
-        } else if( speed == 0){
-            assertTrue(scania.flatBedUp());
-            assertTrue(scania.flatBedDown());
-        }
+            assertThrows(IllegalArgumentException.class, () ->  scania.raiseFlak(10));
+    }
     }
     // the truck cannot drive when the flatbed is up
     @Test
     void cantDriveIfRaise(){
-        double degree = scania.getFlatBed();
+        double degree = scania.getFlak();
         if( degree > 0){
             assertThrows(IllegalArgumentException.class, () -> scania.gas(1));
         }
