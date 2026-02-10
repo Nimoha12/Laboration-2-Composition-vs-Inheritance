@@ -14,25 +14,6 @@ public class Ramp implements Liftable{
     }
     @Override
     public boolean isRaised(){
-        return lift;        // check current state
+        return lift;
     }
 }
-
-/**
- * private final Ramp ramp = new Ramp();
- *
- * public void rampUp(){
- *     if(getCurrentSpeed() != 0) throw new...
- *     ramp.raise();
- * }
- *
- * public void rampDown(){
- *     if(getCurrentSpeed() !=0) throw new...
- *     ramp.lower();
- * }
- *
- * public void gas(double amount){
- *     if(ramp.isRaised()) return;
- *     super.gas(amount);
- * }
- */
