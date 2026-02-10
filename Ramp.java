@@ -17,3 +17,22 @@ public class Ramp implements Liftable{
         return lift;        // check current state
     }
 }
+
+/**
+ * private final Ramp ramp = new Ramp();
+ *
+ * public void rampUp(){
+ *     if(getCurrentSpeed() != 0) throw new...
+ *     ramp.raise();
+ * }
+ *
+ * public void rampDown(){
+ *     if(getCurrentSpeed() !=0) throw new...
+ *     ramp.lower();
+ * }
+ *
+ * public void gas(double amount){
+ *     if(ramp.isRaised()) return;
+ *     super.gas(amount);
+ * }
+ */
