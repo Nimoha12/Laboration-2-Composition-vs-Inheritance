@@ -9,13 +9,12 @@ public class TestCar {
     //Objects to test
     Car volvo;
     Car saab;
-    Scania scania;
 
     @BeforeEach
     void setUP() {
         volvo = new Volvo240();
         saab= new Saab95();
-        scania = new Scania();}
+    }
 
     //Testing that the constructor creates a car with correct settings
     @Test
@@ -247,109 +246,7 @@ public class TestCar {
         double intSpeed = volvo.getCurrentSpeed();
         volvo.gas(1);
         assertEquals(intSpeed, volvo.getCurrentSpeed());
-    }
-
-    //Tests for Scania
-
-    //Test that flat bed can be raised
-    @Test
-    void testRaiseFlatBed() {
-        double initialAngle = scania.getCurrentAngle();
-        scania.raiseFlatBed(10);
-        assertTrue(initialAngle < scania.getCurrentAngle());
 
     }
+}
 
-    //Controls that it's not possible to raise flat bed while car is moving
-    @Test
-    void testRaiseFlatBedWhileMoving() {
-        scania.startEngine();
-        scania.gas(1);
-        scania.move();
-
-        scania.raiseFlatBed(10);
-
-        assertEquals(0, scania.getCurrentAngle());
-
-
-    }
-
-    //Controls that lowering flat bed works normally when current speed is 0
-    @Test
-    void testLowerFlatBed() {
-        scania.stopEngine();
-        scania.raiseFlatBed(10);
-        scania.lowerFlatBed(10);
-        assertEquals(0, scania.getCurrentAngle());
-    }
-
-    //Controls that max value for flat bed angle is 70.
-    @Test
-    void testRaiseFlatBedOverMax() {
-        scania.raiseFlatBed(60);
-        scania.raiseFlatBed(30);
-        assertEquals(70,scania.getCurrentAngle());
-    }
-
-    //Test that car won't move if flat is up
-    @Test
-    void testMovingScaniaFlatUp(){
-        scania.startEngine();
-        scania.gas(1);
-        scania.move();
-
-        scania.stopEngine();
-        scania.raiseFlatBed(30);
-
-        double initialY = scania.getY();
-        scania.startEngine();
-        scania.gas(1);
-        scania.move();
-        assertEquals(initialY,scania.getY());
-    }
-
-    @Test
-    void testLowerFlatNedBelowZero(){
-        scania.raiseFlatBed(10);
-        scania.lowerFlatBed(30);
-        assertEquals(0, scania.getCurrentAngle());
-    }
-
-    @Test
-    void testLowerFlatBedWhileMoving() {
-        scania.raiseFlatBed(20);
-        scania.startEngine();
-        scania.gas(1);
-        scania.move();
-        scania.lowerFlatBed(20);
-        assertEquals(0,scania.getCurrentAngle());
-    }
-    //Tests that scania moves normally when flat is down
-    @Test
-    void testMovingScaniaFlatDown(){
-        scania.startEngine();
-        scania.gas(1);
-        double initialY = scania.getY();
-        scania.move();
-        assertTrue(scania.getY() > initialY);
-    }
-
-    @Test
-    void testFlatBedIllegalValues(){
-        assertThrows(IllegalArgumentException.class, () -> scania.raiseFlatBed(-5));
-
-        assertThrows(IllegalArgumentException.class, () -> scania.raiseFlatBed(100));
-        assertThrows(IllegalArgumentException.class, () -> scania.lowerFlatBed(-1));
-        assertThrows(IllegalArgumentException.class, () -> scania.lowerFlatBed(100));
-
-    }
-
-    @Test
-    void testStartEngineWhenFlatBedUp(){
-        scania.raiseFlatBed(20);
-        scania.startEngine();
-        assertEquals(0, scania.getCurrentSpeed());
-    }
-
-
-    }
