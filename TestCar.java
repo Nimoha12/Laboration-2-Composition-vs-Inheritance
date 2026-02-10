@@ -9,11 +9,21 @@ public class TestCar {
     //Objects to test
     Car volvo;
     Car saab;
+    Scania scania;
+    CarTransporter transporter;
+
 
     @BeforeEach
     void setUP() {
         volvo = new Volvo240();
         saab= new Saab95();
+        scania = new Scania();
+        transporter = new CarTransporter();
+
+    }
+    private void placeCarAtTransporter(Car car) {
+        car.setX(transporter.getX());
+        car.setY(transporter.getY());
     }
 
     //Testing that the constructor creates a car with correct settings
@@ -245,8 +255,191 @@ public class TestCar {
         volvo.stopEngine();
         double intSpeed = volvo.getCurrentSpeed();
         volvo.gas(1);
-        assertEquals(intSpeed, volvo.getCurrentSpeed());
+        assertEquals(intSpeed, volvo.getCurrentSpeed());}
+
+    //Tests for Scania
+
+    //Test that flat bed can be raised
+    @Test
+    void testRaiseFlatBed() {
+        double initialAngle = scania.getCurrentAngle();
+        scania.raiseFlatBed(10);
+        assertTrue(initialAngle < scania.getCurrentAngle());
 
     }
+
+    //Controls that it's not possible to raise flat bed while car is moving
+    @Test
+    void testRaiseFlatBedWhileMoving() {
+        scania.startEngine();
+        scania.gas(1);
+        scania.move();
+
+        scania.raiseFlatBed(10);
+
+        assertEquals(0, scania.getCurrentAngle());
+
+    }
+
+    //Controls that lowering flat bed works
+    @Test
+    void testLowerFlatBed() {
+        scania.raiseFlatBed(10);
+        scania.lowerFlatBed(10);
+        assertEquals(0, scania.getCurrentAngle());
+    }
+
+    //Controls that max value for flat bed angle is 70.
+    @Test
+    void testRaiseFlatBedOverMax() {
+        scania.raiseFlatBed(60);
+        scania.raiseFlatBed(30);
+        assertEquals(70,scania.getCurrentAngle());
+    }
+
+    //Test that car won't move if flat is up
+    @Test
+    void testMovingScaniaFlatUp(){
+        scania.startEngine();
+        scania.gas(1);
+        scania.move();
+        scania.raiseFlatBed(30);
+        double initialY = scania.getY();
+        scania.move();
+        assertEquals(initialY,scania.getY());
+    }
+
+    @Test
+    void testLowerFlatNedBelowZero(){
+        scania.raiseFlatBed(10);
+        scania.lowerFlatBed(30);
+        assertEquals(0, scania.getCurrentAngle());
+    }
+
+    //Tests that scania moves normally when flat is down
+    @Test
+    void testMovingScaniaFlatDown(){
+        scania.startEngine();
+        scania.gas(1);
+        double initialY = scania.getY();
+        scania.move();
+        assertTrue(scania.getY() > initialY);
+    }
+
+    @Test
+    void testFlatBedIllegalValues(){
+        assertThrows(IllegalArgumentException.class, () -> scania.raiseFlatBed(-5));
+
+        assertThrows(IllegalArgumentException.class, () -> scania.raiseFlatBed(100));
+        assertThrows(IllegalArgumentException.class, () -> scania.lowerFlatBed(-1));
+    }
+
+    @Test
+    void testStartEngineWhenFlatBedUp(){
+        scania.raiseFlatBed(20);
+        scania.startEngine();
+        assertEquals(0, scania.getCurrentSpeed());
+    }
+
+    //Tests for transporter
+    @Test
+    void testRampDownOnlyWhenStandingStill() {
+        transporter.startEngine();
+        transporter.gas(1);
+
+        transporter.lowerRamp();
+        assertFalse(transporter.isRampDown());
+
+        transporter.stopEngine();
+        transporter.lowerRamp();
+        assertTrue(transporter.isRampDown());
+
+    }
+
+    @Test
+    void testCannotLoadWhenRampUp() {
+        placeCarAtTransporter(volvo);
+        assertThrows(IllegalStateException.class,() ->transporter.unloadCar());
+    }
+
+    @Test
+    void testLoadAndUnloadWhenRampDown () {
+        transporter.lowerRamp();
+
+        placeCarAtTransporter(volvo);
+
+        transporter.loadCar(volvo);
+        Car unloaded = transporter.unloadCar();
+
+        assertEquals(volvo, unloaded);
+    }
+
+    @Test
+    void testCannotLoadMoreThanMaxCars() {
+        transporter.lowerRamp();
+        placeCarAtTransporter(volvo);
+        placeCarAtTransporter(saab);
+
+        transporter.loadCar(volvo);
+        transporter.loadCar(saab);
+
+        Car extraCar = new Volvo240();
+        placeCarAtTransporter(extraCar);
+
+        // Loading extra car should throw exception
+        assertThrows(IllegalStateException.class, () -> transporter.loadCar(extraCar));
+
+        // Unload in LIFO order
+        assertEquals(saab, transporter.unloadCar());
+        assertEquals(volvo, transporter.unloadCar());
+
+        // Transporter empty: unloading throws
+        assertThrows(IllegalStateException.class, () -> transporter.unloadCar());
+
+    }
+
+    @Test
+    void testCannotLoadAnotherCarTransporter() {
+        transporter.lowerRamp();
+
+        CarTransporter otherTransporter = new CarTransporter();
+        otherTransporter.setX(transporter.getX());
+        otherTransporter.setY(transporter.getY());
+
+        assertThrows(IllegalStateException.class, () ->transporter.loadCar(otherTransporter));
+
+    }
+
+    @Test
+    void testLoadedCarsMoveWithTransporter() {
+        transporter.lowerRamp();
+        placeCarAtTransporter(volvo);
+
+        transporter.loadCar(volvo);
+
+        transporter.raiseRamp();
+        transporter.startEngine();
+        transporter.gas(1);
+        transporter.move();
+
+        assertEquals(transporter.getX(), volvo.getX());
+        assertEquals(transporter.getY(),volvo.getY());
+
+    }
+
+    @Test
+    void testUnloadIsLastInFirstOut() {
+        transporter.lowerRamp();
+        placeCarAtTransporter(volvo);
+        placeCarAtTransporter(saab);
+
+        transporter.loadCar(volvo);
+        transporter.loadCar(saab);
+
+        //Last in, first out
+        assertEquals(saab, transporter.unloadCar());
+        assertEquals(volvo, transporter.unloadCar());
+    }
 }
+
 
