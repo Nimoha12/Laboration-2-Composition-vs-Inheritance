@@ -10,7 +10,9 @@ public class Scania extends Car{
         this.flatBed = 0.0;
     }
 
-    public double getFlatBed(){ return flatBed;}
+    public double getFlatBed(){
+        return flatBed;}
+
     // the maximum angle of the flatbed should not exceed 70 degree and raise only if the truck is stopped
     public void raiseFlatBed(double degree){
         flatBedUp();
@@ -23,19 +25,20 @@ public class Scania extends Car{
         flatBedDown();
         flatBed = Math.max(flatBed - degree, 0.0);
     }
+    // a helper function (flag) that see if we can still raise or lower the flatbed
+    // to prevent raising and lowering beyond the allowed range
     public boolean flatBedUp(){
-        if(getFlatBed() > 0 || getFlatBed() < 70){
+        if(getFlatBed() > 0 && getFlatBed() < 70){
             return true;
         } else {
             return false;
         }
     }
     public boolean flatBedDown(){
-        if(getFlatBed() > 0 || getFlatBed() < 70){
+        if(getFlatBed() > 0 && getFlatBed() < 70){
             return true;
         } else {
-            return false;
-    }
+            return false;}
     }
     // the truck drives if and only the flatbed is at 0 degree
     // might fix this later
@@ -45,6 +48,12 @@ public class Scania extends Car{
             super.move();
         }
     }
+    // the truck cannot drive if the flatbed angle is non-zero, means speed = 0
     @Override
-    protected double speedFactor(){ return getEnginePower() * 0.01 * flatBed;}
+    protected double speedFactor(){
+        if(flatBed > 0){
+            return 0;
+        }
+        return getEnginePower() * 0.01;
+    }
 }
