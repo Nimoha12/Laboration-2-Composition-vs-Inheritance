@@ -329,9 +329,9 @@ public class TestCar {
     @Test
     void testFlatBedIllegalValues(){
         assertThrows(IllegalArgumentException.class, () -> scania.raiseFlatBed(-5));
-
         assertThrows(IllegalArgumentException.class, () -> scania.raiseFlatBed(100));
         assertThrows(IllegalArgumentException.class, () -> scania.lowerFlatBed(-1));
+        assertThrows(IllegalArgumentException.class, () -> scania.lowerFlatBed(100));
     }
 
     @Test
@@ -435,7 +435,7 @@ public class TestCar {
 
         transporter.loadCar(volvo);
         transporter.loadCar(saab);
-
+        
         //Last in, first out
         assertEquals(saab, transporter.unloadCar());
         assertEquals(volvo, transporter.unloadCar());
